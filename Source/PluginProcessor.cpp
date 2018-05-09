@@ -95,8 +95,9 @@ void WavetableVstAudioProcessor::changeProgramName (int index, const String& new
 //==============================================================================
 void WavetableVstAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+	float sampleRateCopy = (int) sampleRate;
 	createWavetable();
-	oscillators.prepareToPlay(1, sineTable, sampleRate);
+	oscillators.prepareToPlay(25, sineTable, sampleRateCopy);
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 }
@@ -152,15 +153,18 @@ void WavetableVstAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiB
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumOutputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
+    //for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
+    //{
+        //auto* channelData = buffer.getWritePointer (channel);
+    //}
+	auto* channelData0 = buffer.getWritePointer(0);
+	auto* channelData1 = buffer.getWritePointer(1);
 	for (auto sample = 0; sample < buffer.getNumSamples(); ++sample) {
 		auto output = oscillators.getNextSample();
-		channelData[sample] = output; 
+		channelData0[sample] = channelData1[sample] = output; 
 	}
         // ..do something to the data...
-    }
+    
 }
 
 //==============================================================================
